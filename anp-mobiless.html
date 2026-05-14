@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ANP Quiz</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-user-select: none;
+  user-select: none;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
+}
+body {
+  background: #0a1628;
+  color: #f5f0e8;
+  font-family: Arial, sans-serif;
+  padding: 12px;
+  font-size: 16px;
+}
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+h1 {
+  color: #c9a84c;
+  font-size: 26px;
+  margin-bottom: 5px;
+}
+.header p {
+  font-size: 13px;
+  color: #999;
+}
+#menu {
+  max-width: 100%;
+  margin: 0 auto;
+}
+.section {
+  margin: 15px 0;
+}
+.section-label {
+  font-size: 11px;
+  color: #c9a84c;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+@media(max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.card {
+  background: #112240;
+  border: 2px solid #c9a84c;
+  padding: 16px 10px;
+  margin: 0;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s, border-color 0.15s;
+  word-wrap: break-word;
+}
+.card.active {
+  background: #1a3a52;
+  border-color: #e8c96b;
+  box-shadow: 0 0 10px #c9a84c;
+}
+button {
+  background: #c9a84c;
+  color: #0a1628;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 16px;
+  width: 100%;
+  min-height: 56px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s;
+}
+button:active {
+  background: #e8c96b;
+}
+#quiz {
+  display: none;
+}
+.progress {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+.bar {
+  height: 100%;
+  background: #c9a84c;
+  width: 0%;
+  transition: width 0.3s;
+}
+.question {
+  background: #112240;
+  border-left: 4px solid #c9a84c;
+  padding: 16px;
+  margin: 15px 0;
+  border-radius: 6px;
+  line-height: 1.6;
+  font-size: 15px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.options {
+  margin: 12px 0;
+}
+.option {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px;
+  margin: 8px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.option:active {
+  border-color: #c9a84c;
+  background: rgba(201, 168, 76, 0.2);
+}
+.option.correct {
+  background: rgba(26, 122, 74, 0.3);
+  border-color: #6ee7a8;
+}
+.option.wrong {
+  background: rgba(192, 57, 43, 0.3);
+  border-color: #ff6b6b;
+}
+.option.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.feedback {
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 4px;
+  font-size: 14px;
+  display: none;
+  word-wrap: break-word;
+}
+.feedback.show {
+  display: block;
+}
+.feedback.ok {
+  background: rgba(26, 122, 74, 0.2);
+  color: #6ee7a8;
+  border-left: 4px solid #6ee7a8;
+}
+.feedback.ko {
+  background: rgba(192, 57, 43, 0.2);
+  color: #ff6b6b;
+  border-left: 4px solid #ff6b6b;
+}
+.next-btn {
+  display: none;
+  margin-top: 16px;
+}
+.next-btn.show {
+  display: block;
+}
+#results {
+  display: none;
+  text-align: center;
+}
+#results h2 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+.score {
+  font-size: 48px;
+  color: #c9a84c;
+  margin: 20px 0;
+  font-weight: bold;
+}
+.stat {
+  background: #112240;
+  padding: 16px;
+  border-radius: 6px;
+  border-left: 4px solid #c9a84c;
+  margin: 12px 0;
+}
+.stat-v {
+  font-size: 32px;
+  color: #c9a84c;
+  font-weight: bold;
+}
+.review {
+  text-align: left;
+  margin-top: 20px;
+}
+.review-i {
+  background: #112240;
+  padding: 12px;
+  margin: 8px 0;
+  border-left: 4px solid #666;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+.review-i.ok {
+  border-left-color: #6ee7a8;
+}
+.review-i.ko {
+  border-left-color: #ff6b6b;
+}
+.meta {
+  color: #999;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📚 ANP Quiz</h1>
+  <p>Examen oficial Târgu Ocna</p>
+</div>
+
+<div id="menu">
+  <div class="section">
+    <div class="section-label">Alege disciplina</div>
+    <div class="grid">
+      <div class="card active" id="d-romana">🇷🇴 Română</div>
+      <div class="card" id="d-istorie">📖 Istorie</div>
+      <div class="card" id="d-ambele">📋 Ambele</div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <div class="section-label">Alege testul</div>
+    <div class="grid" id="test-options"></div>
+  </div>
+  
+  <button id="start-btn">Începe →</button>
+</div>
+
+<div id="quiz">
+  <div class="progress"><div class="bar" id="pb"></div></div>
+  <div class="meta"><span id="ct">1/10</span></div>
+  <div class="question" id="qt"></div>
+  <div class="options" id="an"></div>
+  <div class="feedback" id="fb"></div>
+  <button class="next-btn" id="next-btn">Următoarea →</button>
+</div>
+
+<div id="results">
+  <h2>Rezultate</h2>
+  <div class="score" id="sc">0 / 10</div>
+  <div class="stat">
+    <div class="stat-v" id="sv">0</div>
+    <div>Răspunsuri corecte</div>
+  </div>
+  <div class="review">
+    <h3>Răspunsuri</h3>
+    <div id="rv"></div>
+  </div>
+  <button id="back-btn">← Înapoi</button>
+  <button id="retry-btn">Încearcă din nou →</button>
+</div>
+
+<script>
+const ROMANA = [
+  {q:"Precizează seria care conţine doar cuvinte derivate:", o:["hotoman, măturoi, demult","atică, băboi, răuvoitor","măsuță, bradul, voinicește","fierărie, tufiș, ființă"], a:3},
+  {q:"Fac parte din aceeași familie lexicală toate cuvintele din seria:", o:["frunză, copac, tulpină","frunzuliță, frunzos, frunzărime","bujor, trandafir, lalea","tristețe, fericire, bucurie"], a:1},
+  {q:"Sunt compuse TOATE cuvintele din seria:", o:["CEC, floarea-soarelui, băsmăluță","zgârie-brânză, Romgaz, astfel","cetățenie, Vatra Dornei, UNESCO","bun-simț, DEX, alegere"], a:1},
+  {q:"Sunt monosemantice (cu sens unic) TOATE cuvintele din seria:", o:["inel, con, cer","licorn, histogramă, crom","ochi, cruce, toc","picior, cromosferă, sare"], a:1},
+  {q:"Sunt sinonime TOATE cuvintele din seria:", o:["darnic, mărinimos, generos","destept, inteligent, profund","uragan, furtună, vânt","norocos, fericit, talentat"], a:0},
+  {q:"Sunt paronime cuvintele:", o:["dependență-dependință","sinonimie-antonimie","complice-complot","atlas-atlet"], a:0},
+  {q:"Sunt locuțiuni TOATE expresiile din seria:", o:["în față, bagare seamă","pe înserat, duce dorul","din moment ce, din pricina","cu cap nori, cu scopul de"], a:0},
+  {q:"Sunt articulate corect TOATE formele de plural din seria:", o:["eseuri, litoraluri, indexuri","mormânturi, crocodili, semnări","gogoașe, poieni, cristalinuri","conjugări, înghesuieli, seminarii"], a:0},
+  {q:"Verbul A FI este auxiliar (nu copulă) în propoziția:", o:["Copilul este acasă","Andrei a fost în piață","Ar fi învățat zilnic dacă ar avea timp","Prăjitura este gustoasă"], a:2},
+  {q:"Sunt corecte TOATE formele de imperativ din seria:", o:["nu fii!, mergeți!, nu alerga!","nu duce!, fă!, nu zice!","nu faci!, nu tace!, fii!","nu zice-ți!, mergeți!, nu tăceți!"], a:1},
+  {q:"Sunt corecte TOATE formele de infinitiv din seria:", o:["a fi, a gândi, a agrea, a plăcea","a fii, a gândi, a agrea, a place","a fi, a gândi, a agrea, a place","a fi, a gândii, a agreea, a place"], a:2},
+  {q:"Sunt neologisme TOATE cuvintele din seria:", o:["effect, ghid, ochi, sigur","pasaport, farmec, catrință, doctor","viață, moleculă, teoremă, vector","temporar, barabula, drum, unt"], a:1},
+  {q:"Sunt hiatus TOATE cuvintele din seria:", o:["ființă, soare, amiciție","coală, oameni, biologie","viitură, zăpăceală, cheamă","ideal, proprietar, voință"], a:3},
+  {q:"Sunt diptonguri TOATE cuvintele din seria:", o:["ceai, iarbă, coate","băiețaș, ceai, el","ciocan, greu, tăun","trei, ciolan, pui"], a:1},
+  {q:"Sunt pronume personale din seria:", o:["acesta, altul, el","acela, aceștia, aceia","oricine, oricare, orice","celeilalte, nimănui, niciunuia"], a:0},
+  {q:"Sunt antonime cuvintele:", o:["încetat-încordat","liniște-gălăgie, deștept-ipocrit","a sfârși-a începe, leneș-harnic","profesor-dascăl, solitar-solidar"], a:2},
+  {q:"Sunt cuvinte cu sens figurat TOATE din seria:", o:["Pe aripă avionului era pictat","Puiul aripă rănit","Aripă mașină zgâriată","S-a lăsat atins de aripa speranței"], a:3},
+  {q:"Sunt colective TOATE substantivele din seria:", o:["maldăr, roi, trib","cvartet, mușuroi, oameni","insectar, flotă, căutări","haită, armata, trotinete"], a:0},
+  {q:"Sensul neologismului INDOLENT este:", o:["lipsit de expresivitate","nepăsător, fără voință","dezagradabil la aspect","nefericit, depresiv"], a:1},
+  {q:"Sunt corect despărțite în silabe TOATE cuvintele din seria:", o:["at-let, tit-lu, mon-stru","cab-lu, i-de-e, lu-nă","a-tlet, ti-tlu, mon-stru","ca-blu, i-dee, lu-nă"], a:2},
+  {q:"Sunt corecte TOATE formele de genitiv și dativ din seria:", o:["inghetatei, inghetatelor","inghetații, inghetalelor","inghetatei, inghetăților","inghetații, inghetălilor"], a:2},
+  {q:"Sunt masculine TOATE substantivele din seria:", o:["tablou, vulcan, conac","ciclon, croasant, crenvurst","labirint, echer, seminar","pardesiu, sac, șampon"], a:1},
+  {q:"Pronumele demonstrative sunt TOATE din seria:", o:["acesta, altul, el","acela, aceștia, aceia","oricine, oricare, orice","voi, mă, el, nouă"], a:1},
+  {q:"Sunt adjective fără grad de comparație TOATE din seria:", o:["perfect, pozitiv, interesant","splendid, ultracental, serios","interior, incapabil, curios","maxim, rotund, suprem"], a:3},
+  {q:"Sunt adverbe TOATE cuvintele din seria:", o:["ieri, ușor, din, bej","acum, sus, românește, altădată","dedesup, nikolas, nosinicație","acolo, atunci, spre, decor"], a:1},
+  {q:"Sunt complemente circumstanțiale din seria:", o:["La fațada casei","Vorbesc despre cărți","Alerg în parc","L-am văzut când intră"], a:2},
+  {q:"Sunt complemente directe TOATE din seria:", o:["L-am văzut ieri","Îmi place cartea","Gândesc la tine","Merg în casă"], a:0},
+  {q:"Identifică enunțul cu subiect neexprimat:", o:["Copiii joacă fotbal","Se întorceau fetele în sat","Este indicat a citi","Vede ce poate"], a:3},
+  {q:"Sunt corect accentuate TOATE cuvintele din seria:", o:["duminícă, ímplicat, mónopol","fenomén, impresíe, précar","musacá, dóctoriţă, avárie","regizór, pensionár, strúngărie"], a:2},
+  {q:"Sunt antonime TOATE perechile din seria:", o:["a releva - a revela","maestru - discipol","a inocula - a reocupa","afabil - amabil"], a:1},
+  {q:"Pleonasmul se găsește în seria:", o:["Era solidar cu oamenii lui zilei","Muzul expune manuscrise de mână ale poetului","Vălistori bicisesți capiene","Elică incepu să învârtească"], a:1},
+  {q:"Sensul neologismului MIZANTROP este:", o:["persoană nepoliticoasă","persoană care urăște oamenii","persoană agresivă","persoană nefericită"], a:1},
+  {q:"Sunt paronime din seria:", o:["stoluri - asturici","emis - omis; plantă - platitudine","corect - incorect","masina - manişti"], a:1},
+  {q:"Sunt verbe la diateza pasivă TOATE din seria:", o:["Copilul este talentat","Profesorii sunt interesați","Era evident că vor reuși","Profesorii sunt chemați la cursuri"], a:3},
+  {q:"Predicat nominal se află în seria:", o:["Ajung târziu","Asta înseamnă mult","Motivare acceptată","Ieșit la timp"], a:1},
+  {q:"Substantiv în cazul vocativ se află în seria:", o:["Iubiți mamă, blândei rugământi","Hotărârea lui Mihaela nu a fost apreciată","Iam spus lui Pompilia adieul","La inceputul primaeveri asesteia a fost concursul"], a:0},
+  {q:"Sunt adjective pronominale posesive TOATE din seria:", o:["Prezență noastră o liniștea","Al meu este mai norocos","Decizia este a voastră","Alor tăi le-am spus"], a:0},
+  {q:"Sunt pronume demonstrative TOATE din seria:", o:["acesta, altul, el","acela, aceștia, aceia","oricine, oricare, orice","celeilalte, nimănui, niciunuia"], a:1},
+  {q:"Sunt cu sens figurat TOATE cuvintele din seria:", o:["Pe aripa avionului era pictat","M-a luat de brat pe scări","S-a lovit la brat în cădere","Focul și-a întins brațele flacării"], a:3},
+  {q:"Sunt neologisme corecte TOATE din seria:", o:["curtoazie, invectivă, pulover","curtoazie, invectivă, plover","curtozie, invectiva, pulover","curtuazie, invectivă, pluvăr"], a:0},
+  {q:"Sunt formele corecte de plural TOATE din seria:", o:["seminarii, chibrîte, complete, monezi","seminarii, chibrituri, complete, monede","seminare, chibrîturi, complecturi, monede"], a:1},
+  {q:"Sunt corecte TOATE formele de gerunziu din seria:", o:["accentuând, agréând, doborând, dormind","accentuând, agréind, doborind, dormind","accentund, agréând, doborand, dormindu"], a:0},
+  {q:"Sunt corecte TOATE formele de participiu din seria:", o:["ascultând, ascultând, căutând, aflând, de încercat","ascultand, ascultat, cauzand, aflat, de incercat","ascultând, ascultat, căutând, aflat, de încercat"], a:2},
+  {q:"Identifică enunțul care conține un atribut:", o:["Inalte depune efurt pentru a asigura concursul","El a devenit aviator desavarsit al familiei","Ne-am amintit de efectul de lucru al miniaturei","Apartamentul este situat în zona centrală"], a:3},
+  {q:"Sunt verbe auxiliare TOATE din seria:", o:["Copilul este acasă după școală","Andrei a fost în piață ieri","Ar fi învățat zilnic dacă ar avea timp","Prăjitura este gustoasă și apetisantă"], a:2}
+];
+
+const ISTORIE = [
+  {q:"Constituția din 1866 a inaugurat un regim politic de:", o:["monarhie constituțională","republică democratică","monarhie parlamentară","republică democratică"], a:0},
+  {q:"Tara Cărvunei era situată intre:", o:["Carpații și Dunăre","Mangalia și Varna","Prut și Nistru","Spațiul intracarpatic"], a:1},
+  {q:"Cronica lui Anonymus menționează voievodatele conduse de:", o:["Gyla și Menumorut","Gyla și Ahtum","Gelu, Glad și Menumorut","Litovoi și Seneslau"], a:2},
+  {q:"Prin loviturade stat din 1864 Cuza a impus un nou act constituțional numit:", o:["Statutul Dezvoltator al Convenției de la Paris","Convenția de la Paris","Regulamentele Organice","Constituția Cărvunarilor"], a:2},
+  {q:"Un prim proiect de constituție a fost elaborat la Iași în 1822 și se numea:", o:["Constituția Cărvunarilor","Regulamentul Organic","Convenția de la Iași","Convenția de la Paris"], a:0},
+  {q:"Diploma Cavalerilor Ioanidi a fost emisă în anul:", o:["1211","943","1247","1277"], a:2},
+  {q:"Unificarea organizării de stat și legislației menite să favorizeze progresul întregii națiuni și infăptuirea statului național unitar în 1918 a determinat:", o:["adoptarea unei noi Constituții","împunerea Constituției din 1866","modificarea unor articole din Constituția din 1866","adoptarea Constituției belgiene din 1831"], a:0},
+  {q:"Voievodut Litovoi și frații săi Bărbat s-au ridicat pe la 1277 - 1279 împotriva:", o:["suzeranității otomane","suzeranității maghiare","dominației tătare","dominației polone"], a:1},
+  {q:"Prăbușirea regimului comunist din România și revenirea la un regim democratic după 1989 a impus:", o:["elaborarea unei noi Constituții","punerea în practică a articolelor Constituției din 1918","adoptarea Constituției franceze","adoptarea Convenției de la Paris"], a:0},
+  {q:"Prima etapă a întemeierii Moldovei a fost legată de:", o:["descălecatul lui Dragos","descălecatul lui Negru Vodă","descălecatul lui Bogdan","descălecatul lui Ștefan"], a:1},
+  {q:"Prin Constituția din 1923:", o:["Regatul României este un stat național, unitar și indivizibil","se legifera regimul comunist","România se transformă în Republică Populară Română","România se transformă în Republică Socialistă România"], a:0},
+  {q:"Tipul de război purtat de Țările Române cu otomanii ar putea fi caracterizat drept:", o:["Conflict asimetric","Conflict inutil","Plan de luptă","Strategie militară"], a:0},
+  {q:"Cronica domniei lui Ludovic, scrisă de Ioan de Târnave, semnalează transformarea într-un stat independent a:", o:["Moldovei","Țării Românești","Transilvaniei","Dobrogei"], a:0},
+  {q:"Primul președinte al Prezidiului Marii Adunări Naționale a fost:", o:["Gheorghe Gheorghiu Dej","Nicolae Ceaușescu","Groza","Nicolae Bălcescu"], a:0},
+  {q:"Funcția de președinte al Republicii Socialiste România a fost întâinată în anul:", o:["1965","1974","1968","1985"], a:2},
+  {q:"Mircea cel Bătrân a participat la:", o:["cruciada de la Varna","cruciada a II-a","cruciada a V-a","cruciada de la Nicopole"], a:3},
+  {q:"Regalitatea maghiară revine la instituția voievodatului în Transilvania în anul:", o:["1111","1113","1176","1191"], a:2},
+  {q:"Constituția din 1991 a fost aprobată prin:", o:["referendum","vot cenzitar","consilii consultative locale","consultarea guvernului"], a:0},
+  {q:"La 19 august 1601 Mihai Viteazu a fost asasinat din ordinul lui Basta în tabăra militară aflată pe:", o:["Muntele Găina","Câmpia Călmățuului","Muntele Rodnei","Câmpia Turzii"], a:3},
+  {q:"Prin tratatul de pace de la Berlin (1878), România a primit:", o:["Basarabia","Transilvania","Dobrogea","Bucovina"], a:2},
+  {q:"În 1359 a fost întemeiată prima Mitropoli a Țării Românești de către:", o:["Vladislav Vlaicu","Basarab I","Nicolae Alexandru","Litovoi"], a:2},
+  {q:"Primele monede proprii ale statului medieval Dobrogea au fost realizate în timpul domniei lui:", o:["Ivanco","Dobrotici","Balica","Pudilă"], a:1},
+  {q:"În anul 1541, Transilvania devenea:", o:["Principat autonom sub suzeranitate poloneză","Voievodat independent","Voievodat sub suzeranitate maghiară","Principat autonom sub suzeranitate otomană"], a:2},
+  {q:"Izbucnirea Primului Război Mondial a avut drept pretext asasinarea la Sarajevo, la 28 iunie 1914 a arhiducelui:", o:["Franz Joseph","Rudolf","Carol","Franz Ferdinand"], a:3},
+  {q:"În fruntea Cancelariei Domneștii se afla:", o:["vistiernicului","spătarul","logofatul","comisul"], a:2},
+  {q:"Printre documentele programatice ale mișcării din 1821, conduse de Tudor Vladimirescu, a aflat:", o:["Petiția Proclanatice","Cerurile norodului românesc","Constituția Cărvunarilor","Proclamația de la Islaz"], a:1},
+  {q:"Conform Convenției de la Paris numele noului stat creat era:", o:["România","Principatele române","Regatul România","Principatele Unite ale Moldovei și Țării Românești"], a:2},
+  {q:"Primele universități din Principatele Unite au fost înfiin țate în orașele:", o:["Iași și Bucuresti","Iași și Târgoviște","Bucuresti și Suceava","Iași și Pitești"], a:0},
+  {q:"Membrii Înțelegerii Balcanice, creată la 9 februarie 1934 au fost:", o:["România, Iugoslavia, Grecia și Turcia","România,Iugoslavia, Bulgaria și Albania","România, Iugoslavia, Grecia și Albania","Croația, Muntenegru, Macedonia și Grecia"], a:0},
+  {q:"Carol I a fost rege al României în perioada cuprinsă intre anii:", o:["1866 - 1914","1866 - 1877","1881 - 1914","1878 - 1914"], a:3},
+  {q:"La 26 iunie 1940 ministrul de externe sovietic Molotov a inm ântat ministrului român de la Moscova un ultimatum prin care cerea cedarea:", o:["Cadrilaterului","Nord - Vestul Transilvanie","Basarabiei și a Bucovinei de Nord","Maramureșului"], a:2}
+];
+
+let discipline = 'romana';
+let testSize = 10;
+let questions = [];
+let current = 0;
+let score = 0;
+let history = [];
+let answered = false;
+
+function setupEventListeners() {
+  document.getElementById('d-romana').addEventListener('click', () => selectDiscipline('romana'));
+  document.getElementById('d-istorie').addEventListener('click', () => selectDiscipline('istorie'));
+  document.getElementById('d-ambele').addEventListener('click', () => selectDiscipline('ambele'));
+  document.getElementById('start-btn').addEventListener('click', startQuiz);
+  document.getElementById('next-btn').addEventListener('click', nextQuestion);
+  document.getElementById('back-btn').addEventListener('click', goBack);
+  document.getElementById('retry-btn').addEventListener('click', startQuiz);
+}
+
+function selectDiscipline(d) {
+  discipline = d;
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+  document.getElementById('d-' + d).classList.add('active');
+  updateTestOptions();
+}
+
+function updateTestOptions() {
+  const container = document.getElementById('test-options');
+  container.innerHTML = '';
+  
+  let tests = [];
+  if (discipline === 'romana') tests = [10, 20, 45];
+  else if (discipline === 'istorie') tests = [10, 20, 30];
+  else tests = [10, 20, 75];
+  
+  tests.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'card' + (t === testSize ? ' active' : '');
+    card.textContent = t === 75 ? '📊 75' : t === 45 ? '📋 45' : t === 30 ? '📖 30' : (t === 20 ? '⏱️ 20' : '⚡ 10');
+    card.addEventListener('click', () => selectTest(t, card));
+    container.appendChild(card);
+  });
+}
+
+function selectTest(size, element) {
+  testSize = size;
+  document.querySelectorAll('#test-options .card').forEach(c => c.classList.remove('active'));
+  element.classList.add('active');
+}
+
+function shuffle(arr) {
+  const newArr = [...arr];
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+}
+
+function startQuiz() {
+  let bank = [];
+  if (discipline === 'romana') bank = ROMANA;
+  else if (discipline === 'istorie') bank = ISTORIE;
+  else bank = [...ROMANA, ...shuffle(ISTORIE).slice(0, 30)];
+  
+  questions = shuffle(bank).slice(0, testSize);
+  current = 0;
+  score = 0;
+  history = [];
+  answered = false;
+  
+  document.getElementById('menu').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = questions[current];
+  const progress = ((current + 1) / questions.length) * 100;
+  
+  document.getElementById('pb').style.width = progress + '%';
+  document.getElementById('ct').textContent = (current + 1) + ' / ' + questions.length;
+  document.getElementById('qt').textContent = q.q;
+  
+  const optionsContainer = document.getElementById('an');
+  optionsContainer.innerHTML = '';
+  q.o.forEach((opt, i) => {
+    const optDiv = document.createElement('div');
+    optDiv.className = 'option';
+    optDiv.textContent = String.fromCharCode(65 + i) + ') ' + opt;
+    optDiv.addEventListener('click', () => selectAnswer(i));
+    optionsContainer.appendChild(optDiv);
+  });
+  
+  document.getElementById('fb').textContent = '';
+  document.getElementById('fb').className = 'feedback';
+  document.getElementById('next-btn').classList.remove('show');
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  
+  const q = questions[current];
+  const options = document.querySelectorAll('.option');
+  options.forEach(o => o.classList.add('disabled'));
+  
+  const feedback = document.getElementById('fb');
+  
+  if (idx === q.a) {
+    options[idx].classList.add('correct');
+    score++;
+    feedback.textContent = '✅ Corect!';
+    feedback.className = 'feedback show ok';
+  } else {
+    options[idx].classList.add('wrong');
+    options[q.a].classList.add('correct');
+    feedback.textContent = '❌ Greșit. Corect: ' + String.fromCharCode(65 + q.a) + ') ' + q.o[q.a];
+    feedback.className = 'feedback show ko';
+  }
+  
+  history.push({
+    q: q.q,
+    userAnswer: idx,
+    correctAnswer: q.a,
+    correct: idx === q.a,
+    options: q.o
+  });
+  
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showResults();
+  } else {
+    showQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  
+  document.getElementById('sc').textContent = score + ' / ' + questions.length;
+  document.getElementById('sv').textContent = score;
+  
+  const reviewContainer = document.getElementById('rv');
+  reviewContainer.innerHTML = '';
+  
+  history.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-i ' + (item.correct ? 'ok' : 'ko');
+    const qText = item.q.substring(0, 60) + (item.q.length > 60 ? '...' : '');
+    div.innerHTML = `<strong>${i+1}.</strong> ${qText}<br><small>Tu: ${String.fromCharCode(65+item.userAnswer)}) ${item.options[item.userAnswer]}; Corect: ${String.fromCharCode(65+item.correctAnswer)}) ${item.options[item.correctAnswer]}</small>`;
+    reviewContainer.appendChild(div);
+  });
+}
+
+function goBack() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('menu').style.display = 'block';
+}
+
+setupEventListeners();
+updateTestOptions();
+</script>
+
+</body>
+</html>
